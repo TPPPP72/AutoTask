@@ -10,6 +10,11 @@ struct Rule
     std::vector<int> date;
     std::vector<TimeSeg> timeseg;
     std::vector<std::string> command;
+    void clear(){
+        date.clear();
+        timeseg.clear();
+        command.clear();
+    }
 };
 
 #endif

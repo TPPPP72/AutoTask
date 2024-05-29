@@ -34,15 +34,15 @@ TimeSeg ToTimeSeg(const std::string &str)
     return TimeSeg{ToTimeVal(str1), ToTimeVal(str2)};
 }
 
-int GetCurTimeVal()
-{
-    auto tm = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-    return std::localtime(&tm)->tm_hour*60+std::localtime(&tm)->tm_min;
-}
-
 tm* GetCurTM(){
     auto tm = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
     return std::localtime(&tm);
+}
+
+int GetCurTimeVal()
+{
+    auto tm = GetCurTM();
+    return tm->tm_hour*60+tm->tm_min;
 }
 
 #endif
