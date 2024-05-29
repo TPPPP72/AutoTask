@@ -21,8 +21,7 @@ constexpr int P_BPURPLR = 13;
 constexpr int P_BYELLOW = 14;
 constexpr int P_EWHITE = 15;
 
-template <typename T>
-void Pprint(const T &output, const int &x = 7)
+void Pprint(const auto &output, const int &x = 7)
 {
     if (x >= 0 && x <= 15)
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), x);
