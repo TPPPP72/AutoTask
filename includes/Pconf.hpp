@@ -36,7 +36,17 @@ std::vector<Rule> GetRules()
         else if (i == ']')
         {
             if (cnt == 2)
-                current.command = forall.command, res.emplace_back(current);
+            {
+                if (current.command.size() == 0)
+                    current.command = forall.command;
+                if (current.date.size() == 0)
+                    current.date = forall.date;
+                if (current.timeseg.size() == 0)
+                    current.timeseg = forall.timeseg;
+                if (current.sleep == -1)
+                    current.sleep = forall.sleep;
+                res.emplace_back(current);
+            }
             --cnt;
         }
         else if (i == '{')
@@ -51,19 +61,33 @@ std::vector<Rule> GetRules()
             case 1:
             {
                 if (cnt == 1)
-                    forall.command.emplace_back(buff);
+                    forall.command.emplace_back(SpaceClear(buff));
                 else
-                    current.command.emplace_back(buff);
+                    current.command.emplace_back(SpaceClear(buff));
                 break;
             }
             case 2:
             {
-                current.date.emplace_back(GetDay(buff));
+                if (cnt == 1)
+                    forall.date.emplace_back(GetDay(SpaceClear(buff)));
+                else
+                    current.date.emplace_back(GetDay(SpaceClear(buff)));
                 break;
             }
             case 3:
             {
-                current.timeseg.emplace_back(ToTimeSeg(buff));
+                if (cnt == 1)
+                    forall.timeseg.emplace_back(ToTimeSeg(SpaceClear(buff)));
+                else
+                    current.timeseg.emplace_back(ToTimeSeg(SpaceClear(buff)));
+                break;
+            }
+            case 4:
+            {
+                if (cnt == 1)
+                    forall.sleep = std::stoi(SpaceClear(buff));
+                else
+                    current.sleep = std::stoi(SpaceClear(buff));
                 break;
             }
             }
@@ -88,6 +112,8 @@ int GetStatu(const std::string &str)
         return 2;
     else if (buff == "Time")
         return 3;
+    else if (buff == "Sleep")
+        return 4;
     return 0;
 }
 
