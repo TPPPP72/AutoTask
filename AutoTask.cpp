@@ -1,13 +1,15 @@
 #include <thread>
 #include <algorithm>
+#include <mutex>
 #include "includes\winruntime.hpp"
 #include "includes\Ptime.hpp"
 #include "includes\DataGroup.hpp"
 #include "includes\Pconf.hpp"
 #include "includes\PIO.hpp"
 
-const bool DEBUG = false;
+const bool DEBUG = true;
 Schedule GetSchedule(const std::vector<Rule> &rules, int wday);
+std::timed_mutex mtx;
 
 int main()
 {
@@ -23,14 +25,6 @@ int main()
                 now = GetCurTimeVal();
                 if (DEBUG)
                     PDEBUGprint("Time Updated!\n");
-                int wd = GetCurTM()->tm_wday;
-                if (wd != wday)
-                {
-                    if (DEBUG)
-                        PDEBUGprint("Day switched!\n");
-                    wday = wd;
-                    today = GetSchedule(rules, wday);
-                }
                 if (!sync)
                 {
                     if (DEBUG)
@@ -46,27 +40,56 @@ int main()
                         PDEBUGprint("Time Updated!\n");
                     sync = true;
                 }
+                int wd = GetCurTM()->tm_wday;
+                if (wd != wday)
+                {
+                    wday = wd;
+                    std::unique_lock<std::timed_mutex> lk(mtx, std::defer_lock);
+                    if (lk.try_lock_for(std::chrono::seconds(60)))
+                    {
+                        today = GetSchedule(rules, wday);
+                        if (DEBUG)
+                            PDEBUGprint("Day switched!\n");
+                        sync = false;
+                    }
+                }
                 std::this_thread::sleep_for(std::chrono::seconds(60));
             }
         });
     std::this_thread::sleep_for(std::chrono::seconds(1));
     while (1)
     {
-        for (auto &i : today.tasklist)
+        bool isfindtask = false;
         {
-            while (now >= i.timeseg.st && now <= i.timeseg.ed)
+            std::lock_guard<std::timed_mutex> lg(mtx);
+            if (today.tasklist.size() == 0){
+                if(DEBUG)
+                    PDEBUGprint("No Rule\n");
+                std::this_thread::sleep_for(std::chrono::seconds(30));
+                continue;
+            }
+            for (auto &i : today.tasklist)
             {
-                for (auto &j : i.command)
+                if (now >= i.timeseg.st && now <= i.timeseg.ed)
                 {
-                    if (DEBUG)
-                        PDEBUGprint("Run command:" + j + '\n');
-                    else
-                        Run(j);
+                    for (auto &j : i.command)
+                    {
+                        if (DEBUG)
+                            PDEBUGprint("Run command:" + j + '\n');
+                        else
+                            Run(j);
+                    }
+                    isfindtask = true;
+                    std::this_thread::sleep_for(std::chrono::milliseconds(i.sleep));
                 }
-                std::this_thread::sleep_for(std::chrono::milliseconds(i.sleep));
             }
         }
-        std::this_thread::sleep_for(std::chrono::seconds(30));
+        if (!isfindtask)
+        {
+            if (DEBUG)
+                PDEBUGprint("No task\n");
+            std::this_thread::sleep_for(std::chrono::seconds(30));
+        }
     }
     return 0;
 }
@@ -83,6 +106,8 @@ Schedule GetSchedule(const std::vector<Rule> &rules, int wday)
                     PDEBUGprint("rule:" + std::to_string(i) + '\n');
                 select.emplace_back(rules[i]);
             }
+    if (select.size() == 0)
+        return res;
     for (auto &i : select)
         for (auto &j : i.timeseg)
             res.tasklist.emplace_back(Task{j, i.command, i.sleep});

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <windows.h>
+#include <iomanip>
 #include "Ptime.hpp"
 
 constexpr int P_BLACK = 0;
@@ -38,7 +39,7 @@ void PDEBUGprint(const auto &output)
 {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), P_GREEN);
     auto tm = GetCurTM();
-    std::cout << tm->tm_hour << ':' << tm->tm_min << ':' << tm->tm_sec << '\t' << output;
+    std::cout << std::setw(2)<< std::setfill('0')<< tm->tm_hour<<':'<< std::setw(2)<<tm->tm_min<<':'<< std::setw(2) <<tm->tm_sec<< '\t' << output;
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), P_WHITE);
     return;
 }
