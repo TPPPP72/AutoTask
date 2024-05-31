@@ -7,7 +7,7 @@
 #include "includes\Pconf.hpp"
 #include "includes\PIO.hpp"
 
-const bool DEBUG = true;
+const bool DEBUG = false;
 Schedule GetSchedule(const std::vector<Rule> &rules, int wday);
 std::timed_mutex mtx;
 
