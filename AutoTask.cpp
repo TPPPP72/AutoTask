@@ -13,7 +13,15 @@ std::timed_mutex mtx;
 
 int main()
 {
-    std::vector<Rule> rules = GetRules();
+    Config conf = GetConfig();
+    Startup startup;
+    for (auto &i : startup.command)
+    {
+        Run(i);
+        if (startup.sleep != -1)
+            std::this_thread::sleep_for(std::chrono::milliseconds(startup.sleep));
+    }
+    std::vector<Rule> rules = conf.rules;
     int wday = GetCurTM()->tm_wday, now;
     bool sync = false;
     Schedule today = GetSchedule(rules, wday);
@@ -62,8 +70,9 @@ int main()
         bool isfindtask = false;
         {
             std::lock_guard<std::timed_mutex> lg(mtx);
-            if (today.tasklist.size() == 0){
-                if(DEBUG)
+            if (today.tasklist.size() == 0)
+            {
+                if (DEBUG)
                     PDEBUGprint("No Rule\n");
                 std::this_thread::sleep_for(std::chrono::seconds(30));
                 continue;

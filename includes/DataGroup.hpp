@@ -5,6 +5,12 @@
 #include <vector>
 #include "Ptime.hpp"
 
+struct Startup
+{
+    std::vector<std::string> command;
+    int sleep = -1;
+};
+
 struct Rule
 {
     std::vector<int> date;
@@ -20,12 +26,15 @@ struct Rule
     }
 };
 
-struct Startup
+struct Plan
 {
+    int time;
     std::vector<std::string> command;
+    int sleep = -1;
 };
 
-struct Task{
+struct Task
+{
     TimeSeg timeseg;
     std::vector<std::string> command;
     int sleep;
