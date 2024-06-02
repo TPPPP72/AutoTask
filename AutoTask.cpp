@@ -14,7 +14,7 @@ std::binary_semaphore semephore(1);
 int main()
 {
     Config conf = GetConfig();
-    Startup startup;
+    Startup startup = conf.startup;
     for (auto &i : startup.command)
     {
         Run(i);
