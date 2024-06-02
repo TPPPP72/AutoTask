@@ -1,6 +1,6 @@
 #include <thread>
 #include <algorithm>
-#include <mutex>
+#include <semaphore>
 #include "includes\winruntime.hpp"
 #include "includes\Ptime.hpp"
 #include "includes\DataGroup.hpp"
@@ -9,7 +9,7 @@
 
 const bool DEBUG = false;
 Schedule GetSchedule(const std::vector<Rule> &rules, int wday);
-std::timed_mutex mtx;
+std::binary_semaphore semephore(1);
 
 int main()
 {
@@ -52,14 +52,12 @@ int main()
                 if (wd != wday)
                 {
                     wday = wd;
-                    std::unique_lock<std::timed_mutex> lk(mtx, std::defer_lock);
-                    if (lk.try_lock_for(std::chrono::seconds(60)))
-                    {
-                        today = GetSchedule(rules, wday);
-                        if (DEBUG)
-                            PDEBUGprint("Day switched!\n");
-                        sync = false;
-                    }
+                    semephore.acquire();
+                    today = GetSchedule(rules, wday);
+                    semephore.release();
+                    if (DEBUG)
+                        PDEBUGprint("Day switched!\n");
+                    sync = false;
                 }
                 std::this_thread::sleep_for(std::chrono::seconds(60));
             }
@@ -68,31 +66,31 @@ int main()
     while (1)
     {
         bool isfindtask = false;
+        semephore.acquire();
+        if (today.tasklist.size() == 0)
         {
-            std::lock_guard<std::timed_mutex> lg(mtx);
-            if (today.tasklist.size() == 0)
+            if (DEBUG)
+                PDEBUGprint("No Rule\n");
+            semephore.release();
+            std::this_thread::sleep_for(std::chrono::seconds(30));
+            continue;
+        }
+        for (auto &i : today.tasklist)
+        {
+            if (now >= i.timeseg.st && now <= i.timeseg.ed)
             {
-                if (DEBUG)
-                    PDEBUGprint("No Rule\n");
-                std::this_thread::sleep_for(std::chrono::seconds(30));
-                continue;
-            }
-            for (auto &i : today.tasklist)
-            {
-                if (now >= i.timeseg.st && now <= i.timeseg.ed)
+                for (auto &j : i.command)
                 {
-                    for (auto &j : i.command)
-                    {
-                        if (DEBUG)
-                            PDEBUGprint("Run command:" + j + '\n');
-                        else
-                            Run(j);
-                    }
-                    isfindtask = true;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(i.sleep));
+                    if (DEBUG)
+                        PDEBUGprint("Run command:" + j + '\n');
+                    else
+                        Run(j);
                 }
+                isfindtask = true;
+                std::this_thread::sleep_for(std::chrono::milliseconds(i.sleep));
             }
         }
+        semephore.release();
         if (!isfindtask)
         {
             if (DEBUG)
