@@ -17,9 +17,10 @@ int main()
     Startup startup = conf.startup;
     for (auto &i : startup.command)
     {
-        Run(i);
+        std::thread temp(Run,i);
         if (startup.sleep != -1)
             std::this_thread::sleep_for(std::chrono::milliseconds(startup.sleep));
+        temp.detach();
     }
     std::vector<Rule> rules = conf.rules;
     int wday = GetCurTM()->tm_wday, now;
