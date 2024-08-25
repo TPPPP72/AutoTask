@@ -128,8 +128,10 @@ namespace nlohmann
                               { t.Wday.emplace_back(static_cast<std::string>(i.value())); });
             std::for_each(j["Command"]["content"].items().begin(), j["Command"]["content"].items().end(), [&](const auto &i)
                           { t.Command.content.emplace_back(static_cast<std::string>(i.value())); });
-            t.Command.is_block = j["Command"]["is_block"];
-            t.is_loop = j["is_loop"];
+            if (j["Command"].contains("is_block"))
+                t.Command.is_block = j["Command"]["is_block"];
+            if (j.contains("is_loop"))
+                t.is_loop = j["is_loop"];
             return t;
         }
     };
