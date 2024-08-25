@@ -1,9 +1,9 @@
-#include "config.hpp"
+#include "config.h"
 
 int main()
 {
     Config config;
-    config.Read("new.json");
+    config.Read("rule.json");
     Stage set;
     while (1)
     {
