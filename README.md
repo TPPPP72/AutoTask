@@ -61,8 +61,8 @@ Here's a example:
 ```
 
 ## How to build
-This is a C++ project, please config a compiler in your environment variables.  
-And you can build this project using `build.bat`.
+With cmake,you can just use `cmake --build` to build this project.  
+But you should make sure that your compiler supports for the option `-std=c++17`.
 
 ---
 **Pull requests welcome.**
