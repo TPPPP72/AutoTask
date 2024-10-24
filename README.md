@@ -61,8 +61,8 @@ Here's a example:
 ```
 
 ## How to build
-With cmake,you can just use `cmake --build` to build this project.  
-But you should make sure that your compiler supports for the option `-std=c++17`.
+With cmake,you can this project.  
+But you should make sure that your compiler supports for the option `-std=c++17`.  
 
 ---
 **Pull requests welcome.**
