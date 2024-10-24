@@ -10,7 +10,7 @@
 namespace Ptime
 {
 
-    tm *GetCurTM()
+    inline tm *GetCurTM()
     {
         auto tm = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         return std::localtime(&tm);

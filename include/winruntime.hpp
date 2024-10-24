@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <string>
 
-int Run(const std::string &command)
+inline int Run(const std::string &command)
 {
     STARTUPINFO si;
     PROCESS_INFORMATION pi;

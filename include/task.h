@@ -137,7 +137,7 @@ namespace nlohmann
     };
 }
 
-void to_json(nlohmann::ordered_json &j, const Task &t)
+inline void to_json(nlohmann::ordered_json &j, const Task &t)
 {
     std::for_each(t.Date.begin(), t.Date.end(), [&](const auto &i)
                   { j["Date"].emplace_back(i.ToStr()); });
