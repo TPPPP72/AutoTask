@@ -4,6 +4,8 @@ project(AutoTask CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 aux_source_directory(src SRC)
 
 if(MSVC)

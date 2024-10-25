@@ -1,3 +1,4 @@
 {
-    "clangd.fallbackFlags": ["-I./includes"]
+    "clangd.fallbackFlags": ["-I.\\includes"],
+    "clangd.arguments": ["--compile-commands-dir=.\\build\\compile_commands.json"]
 }
