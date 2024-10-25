@@ -12,4 +12,7 @@ endif()
 
 add_compile_options(-Wall -Wextra -Wpedantic)
 
+message(STATUS "Using C++ compiler: ${CMAKE_CXX_COMPILER_ID}")
+message(STATUS "Compiler version: ${CMAKE_CXX_COMPILER_VERSION}")
+
 add_executable(${PROJECT_NAME} main.cpp)
