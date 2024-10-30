@@ -94,11 +94,11 @@ struct Task
             {
                 if (Command.is_block)
                 {
-                    Run(i);
+                    StartWithParam(i,true);
                 }
                 else
                 {
-                    std::thread thread(Run, i);
+                    std::thread thread(StartWithParam, i,false);
                     thread.detach();
                 }
             }
